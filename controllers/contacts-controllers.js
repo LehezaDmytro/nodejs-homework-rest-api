@@ -1,9 +1,10 @@
 const { HttpError } = require("../helpers");
+const { Contact } = require("../models/contact");
 const contactsServices = require("../models/contacts");
 const { ctrlWrapper } = require("../decorators");
 
 const listContacts = async (req, res) => {
-  const result = await contactsServices.listContacts();
+  const result = await Contact.find();
   res.json(result);
 };
 
@@ -17,7 +18,7 @@ const getContactsById = async (req, res) => {
 };
 
 const addContact = async (req, res) => {
-  const result = await contactsServices.addContact(req.body);
+  const result = await Contact.create(req.body);
   res.status(201).json(result);
 };
 
