@@ -35,8 +35,13 @@ const contactsAddSchema = Joi.object({
   favorite: Joi.boolean(),
 });
 
+const contactsUpdateFavoriteSchema = Joi.object({
+  favorite: Joi.boolean().required(),
+});
+
 const schemas = {
   contactsAddSchema,
+  contactsUpdateFavoriteSchema,
 };
 
 contactsSchema.post("save", handleMongooseError);
