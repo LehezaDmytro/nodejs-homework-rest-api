@@ -19,7 +19,7 @@ const contactsSchema = new Schema(
       default: false,
     },
   },
-  { versionKey: false, timestamps: true }
+  { versionKey: false }
 );
 
 const contactsAddSchema = Joi.object({
