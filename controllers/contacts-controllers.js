@@ -4,9 +4,12 @@ const { ctrlWrapper } = require("../decorators");
 
 const listContacts = async (req, res) => {
   const owner = req.user._id;
-  const { page = 1, limit = 10 } = req.query;
+  const { page = 1, limit = 10, favorite = false } = req.query;
   const skip = (page - 1) * limit;
-  const result = await Contact.find({ owner }, "", { skip, limit });
+  const result = await Contact.find({ owner }, "", { skip, limit }).all(
+    "favorite",
+    favorite
+  );
   res.json(result);
 };
 

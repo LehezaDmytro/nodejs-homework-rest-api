@@ -23,4 +23,11 @@ router.get("/current", authenticate, authControllers.getCurrent);
 
 router.post("/logout", authenticate, authControllers.logout);
 
+router.post(
+  "/",
+  authenticate,
+  validateBody(schemas.userSubscriptionSchema),
+  authControllers.changeSubscription
+);
+
 module.exports = router;
