@@ -76,10 +76,17 @@ const changeSubscription = async (req, res) => {
   });
 };
 
+const changeAvatar = async (req, res) => {
+  res.json({
+    fileURL: req.file.path,
+  });
+};
+
 module.exports = {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
   changeSubscription: ctrlWrapper(changeSubscription),
+  changeAvatar,
 };
