@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const { HttpError } = require("../helpers");
 const { User } = require("../models/user");
 const { ctrlWrapper } = require("../decorators");
+const gravatar = require("gravatar");
 
 const { SECRET_KEY } = process.env;
 
@@ -14,7 +15,16 @@ const register = async (req, res) => {
   }
 
   const heshPassword = await bcrypt.hash(password, 10);
-  const newUser = await User.create({ ...req.body, password: heshPassword });
+  const newAvatar = gravatar.url("legeza@mail.com", {
+    s: 250,
+    r: "x",
+    d: "robohash",
+  });
+  const newUser = await User.create({
+    ...req.body,
+    password: heshPassword,
+    avatarURL: newAvatar,
+  });
 
   res.status(201).json({
     user: {
