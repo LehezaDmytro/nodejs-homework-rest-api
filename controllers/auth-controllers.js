@@ -1,16 +1,17 @@
 const fs = require("fs/promises");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { HttpError } = require("../helpers");
+const { HttpError, sendEmail } = require("../helpers");
 const { User } = require("../models/user");
 const { ctrlWrapper } = require("../decorators");
 const gravatar = require("gravatar");
 const path = require("path");
 const jimp = require("jimp");
+const { nanoid } = require("nanoid");
 
 const avatarsDir = path.resolve("public", "avatars");
 
-const { SECRET_KEY } = process.env;
+const { SECRET_KEY, BASE_URL } = process.env;
 
 const register = async (req, res) => {
   const { email, password } = req.body;
@@ -20,8 +21,9 @@ const register = async (req, res) => {
   }
 
   const heshPassword = await bcrypt.hash(password, 10);
+
   const newAvatar = gravatar.url(
-    "legeza@mail.com",
+    email,
     {
       s: 250,
       r: "pd",
@@ -29,11 +31,25 @@ const register = async (req, res) => {
     },
     true
   );
+
+  const verificationToken = nanoid();
+  const verifiLink = `${BASE_URL}/users/verify/${verificationToken}`;
+
+  const data = {
+    to: email,
+    subject: "Veryfi email",
+    html: `<a target="_blank" href="${verifiLink}">Click verify email</a>`,
+  };
+
   const newUser = await User.create({
     ...req.body,
     password: heshPassword,
     avatarURL: newAvatar,
+    verificationToken,
   });
+
+  const emeilSent = await sendEmail(data);
+  console.log(emeilSent);
 
   res.status(201).json({
     user: {
