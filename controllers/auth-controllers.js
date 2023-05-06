@@ -48,8 +48,7 @@ const register = async (req, res) => {
     verificationToken,
   });
 
-  const emeilSent = await sendEmail(data);
-  console.log(emeilSent);
+  await sendEmail(data);
 
   res.status(201).json({
     user: {
@@ -64,6 +63,10 @@ const login = async (req, res) => {
   const user = await User.findOne({ email });
   if (!user) {
     throw HttpError(401, "Email or password is wrong");
+  }
+
+  if (!user.verify) {
+    throw HttpError(401, "Email not verify");
   }
 
   const passwordCompare = await bcrypt.compare(password, user.password);
@@ -127,11 +130,51 @@ const changeAvatar = async (req, res) => {
   });
 };
 
+const verify = async (req, res) => {
+  const { verificationToken } = req.params;
+  const user = await User.findOne({ verificationToken });
+  if (!user) {
+    throw HttpError(404, "User not found");
+  }
+  await User.findByIdAndUpdate(user._id, {
+    verificationToken: null,
+    verify: true,
+  });
+  res.status(200).json({
+    message: "Verification successfu",
+  });
+};
+
+const reVerification = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    throw HttpError(400, "missing required field email");
+  }
+  const user = await User.findOne({ email });
+  if (user.verify) {
+    throw HttpError(400, "Verification has already been passed");
+  }
+
+  const verifiLink = `${BASE_URL}/users/verify/${user.verificationToken}`;
+  const data = {
+    to: email,
+    subject: "Veryfi email",
+    html: `<a target="_blank" href="${verifiLink}">Click verify email</a>`,
+  };
+  await sendEmail(data);
+
+  res.status(200).json({
+    message: "Verification email sent",
+  });
+};
+
 module.exports = {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
   changeSubscription: ctrlWrapper(changeSubscription),
-  changeAvatar,
+  changeAvatar: ctrlWrapper(changeAvatar),
+  verify: ctrlWrapper(verify),
+  reVerification: ctrlWrapper(reVerification),
 };
