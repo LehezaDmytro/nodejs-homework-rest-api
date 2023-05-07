@@ -37,4 +37,11 @@ router.patch(
   authControllers.changeAvatar
 );
 
+router.get("/verify/:verificationToken", authControllers.verify);
+router.post(
+  "/verify",
+  validateBody(schemas.verifyEmailSchema),
+  authControllers.reVerification
+);
+
 module.exports = router;

@@ -1,4 +1,4 @@
-const { HttpError } = require("../helpers");
+const { HttpError, sendMail, sendEmail } = require("../helpers");
 const { Contact } = require("../models/contact");
 const { ctrlWrapper } = require("../decorators");
 
@@ -10,6 +10,7 @@ const listContacts = async (req, res) => {
     "favorite",
     favorite
   );
+
   res.json(result);
 };
 
